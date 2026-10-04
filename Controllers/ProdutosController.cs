@@ -1,8 +1,7 @@
 using System.Security.Cryptography.X509Certificates;
 using Microsoft.AspNetCore.Mvc;
-using MinhaPrimeiraAPI.Models;
-
-namespace MinhaPrimeiraAPI.Controllers;
+using MinhaPrimeiraApi.Models;
+namespace MinhaPrimeiraApi.Controllers;
 
 [ApiController]
 

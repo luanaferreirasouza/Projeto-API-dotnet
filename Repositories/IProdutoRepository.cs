@@ -7,4 +7,6 @@ using MinhaPrimeiraApi.Models;
         Task<Produto> CriarAsync(Produto produto);
         Task<Produto?> AtualizarAsync(int id, Produto produto);
         Task<bool> ExcluirAsync(int id);
+
+        Task<bool> ExisteNomeAsync (string nome);
     }

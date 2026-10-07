@@ -56,4 +56,9 @@ public class ProdutoRepository : IProdutorRepository
         await _context.SaveChangesAsync();
         return true;
     }
+
+    public async Task<bool> ExisteNomeAsync(string nome)
+    {
+        return await _context.Produtos.AnyAsync(p => p.Nome == nome);
+    }
 }

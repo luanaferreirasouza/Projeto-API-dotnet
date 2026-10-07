@@ -32,7 +32,7 @@ public class ProdutosController : ControllerBase
             return BadRequest("O ID deve ser maior que zero.");
         }
 
-        var produto = await _context.Produtos.FirstOrDefaultAsync(p => p.Id == id);
+        var produto = await _context.Produtos.FindAsync(id);
 
         if (produto == null)
         {

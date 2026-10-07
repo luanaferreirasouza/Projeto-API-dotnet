@@ -1,5 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using MinhaPrimeiraApi.Data;
+using MinhaPrimeiraApi.Repositories;
+using MinhaPrimeiraApi.Services;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +23,9 @@ builder.Services.AddControllers(opction =>
         .AllowAnyMethod();
     });
 });
+builder.Services.AddScoped<IProdutoService, ProdutoService>();
+builder.Services.AddScoped<IProdutorRepository, ProdutoRepository>();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

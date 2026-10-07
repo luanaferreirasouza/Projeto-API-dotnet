@@ -1,8 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using MinhaPrimeiraApi.Models;
 namespace MinhaPrimeiraApi.Controllers;
-using MinhaPrimeiraApi.Data;
-using Microsoft.EntityFrameworkCore;
 
 [ApiController]
 
@@ -10,18 +8,18 @@ using Microsoft.EntityFrameworkCore;
 
 public class ProdutosController : ControllerBase
 {
-    private readonly AppDbContext _context;
+    private readonly IProdutoService _service;
 
-    public ProdutosController(AppDbContext context)
+    public ProdutosController(IProdutoService service)
     {
-        _context = context;
+        _service = service;
     }
 
     [HttpGet]
 
     public async Task<IActionResult> ListarTodos()
     {
-        var produtos = await _context.Produtos.ToListAsync();
+        var produtos = await _service.ListarTodosAsync();
         return Ok(produtos);
     }
     [HttpGet("{id}")]
@@ -32,7 +30,7 @@ public class ProdutosController : ControllerBase
             return BadRequest("O ID deve ser maior que zero.");
         }
 
-        var produto = await _context.Produtos.FindAsync(id);
+        var produto = await _service.BuscarPorIdAsync(id);
 
         if (produto == null)
         {
@@ -50,10 +48,15 @@ public class ProdutosController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        _context.Produtos.Add(produto);
-        await _context.SaveChangesAsync();
-
-        return Ok($"Produto '{produto.Nome}' criado com sucesso!");
+         try
+        {
+            var criado = await _service.CriarAsync(produto);
+            return CreatedAtAction(nameof(BuscarPorId), new { id = criado.Id }, criado);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
     }
 
     [HttpPut("{id}")]
@@ -63,29 +66,22 @@ public class ProdutosController : ControllerBase
         {
             return BadRequest(ModelState);
         }
-        var produto = await _context.Produtos.FindAsync(id);
+        var produto = await _service.AtualizarAsync(id, produtoAtualizado);
         if (produto == null)
         {
             return NotFound($"Produto com ID {id} não encontrado.");
         }
-
-        produto.Nome = produtoAtualizado.Nome;
-        produto.Preco = produtoAtualizado.Preco;
-
-        await _context.SaveChangesAsync();
         return Ok($"Produto com ID {id} atualizado com sucesso!");
     }
     [HttpDelete("{id}")]
     public async Task<IActionResult> Deletar (int id)
     {
-        var produto = await _context.Produtos.FindAsync(id);
-        if (produto == null)
+        var removido = await _service.ExcluirAsync(id);
+        if (!removido)
         {
             return NotFound($"Produto com ID {id} não encontrado.");
         }
 
-        _context.Produtos.Remove(produto);
-        await _context.SaveChangesAsync();
-        return Ok($"Produto com ID {id} deletado com sucesso!");
+        return NoContent();
     }
 }
